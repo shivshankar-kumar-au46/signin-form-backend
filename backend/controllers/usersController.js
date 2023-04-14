@@ -1,5 +1,4 @@
 const User = require('../models/userSchema');
-const SECREAT_KEY = 'ksfkskljfsl'
 const jwt = require('jsonwebtoken');
 
 const getUser = async (req, res) => {
@@ -48,7 +47,7 @@ const signinUser = async(req, res) => {
         } 
         const userPayLoad = {email}
         //Generate the token
-        const token = jwt.sign(userPayLoad, SECREAT_KEY, {algorithm:'HS256', expiresIn:'1d'}  )
+        const token = jwt.sign(userPayLoad, process.env.SECREAT_KEY, {algorithm:'HS256', expiresIn:'1d'}  )
         res.cookie('jwt', token)
         res.send({status:'success', msg:'User login successfully'})
 

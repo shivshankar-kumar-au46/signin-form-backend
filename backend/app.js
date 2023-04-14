@@ -5,9 +5,12 @@ const app = express();
 const PORT = process.env.PORT
 const router = require('./routers/users');
 const cors = require('cors');
+const cookieParser = require('cookie-parser');
 
 app.use(cors());
 app.use(express.json());
+app.use(express.urlencoded({extended:true}))
+app.use(cookieParser())
 app.use('/', router);
 
 app.get('/', (req, res)=>{
