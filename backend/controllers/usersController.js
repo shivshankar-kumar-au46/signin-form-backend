@@ -17,6 +17,7 @@ try {
 
 const addUser = async(req, res) => {
     const {name, email, password} = req.body;
+    console.log(req.body)
     
     try {
         const existingUser = await User.findOne({email})
@@ -32,13 +33,14 @@ const addUser = async(req, res) => {
     }
 }
 
-const signinUser = async(req, res) => {
+const loginUser = async(req, res) => {
     const {email, password} = req.body
+    console.log(req.body)
   
 
     try {
         const signinUser = await User.findOne({email, password})
-        console.log(signinUser)
+        // console.log(signinUser)
         if(!signinUser){
             res.status(404).json({success:false, msg:"User not found please registred first"})
         }
@@ -47,9 +49,20 @@ const signinUser = async(req, res) => {
         } 
         const userPayLoad = {email}
         //Generate the token
-        const token = jwt.sign(userPayLoad, process.env.SECREAT_KEY, {algorithm:'HS256', expiresIn:'1d'}  )
-        res.cookie('jwt', token)
-        res.send({status:'success', msg:'User login successfully'})
+        const jwttoken = await jwt.sign(userPayLoad, process.env.SECREAT_KEY)
+        console.log(jwttoken)
+        return res.status(200).json({ success: true, response: "User login done", token: jwttoken })
+
+
+
+
+        // const jwttoken = jwt.sign(userPayLoad, process.env.SECREAT_KEY, {algorithm:'HS256', expiresIn:"7d"}  )
+        // console.log('token generated')
+        // // res.cookie('jwt', token)
+        // console.log('token sent')
+        // // console.log(token)
+
+        // res.json({status:'success',token:jwttoken, msg:'User login successfully'})
 
 
     } catch (error) {
@@ -58,8 +71,14 @@ const signinUser = async(req, res) => {
 
 }
 
+const logoutUser = async (req, res) => {
+    res.clearCookie('jwt'); // clear the token cookie
+    res.json({success:true, msg:'logout successfully'})
+  };
+
 module.exports = {
     getUser,
     addUser,
-    signinUser
+    loginUser,
+    logoutUser
 }
