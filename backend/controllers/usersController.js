@@ -51,11 +51,19 @@ const loginUser = async(req, res) => {
          if(signinUser.password !== password){
             res.status(400).send({success:false, msg:'password incorrect'})
         } 
-        const userPayLoad = {email}
-        //Generate the token
-        const jwttoken = await jwt.sign(userPayLoad, process.env.SECREAT_KEY)
-        console.log(jwttoken)
-        return res.status(200).json({ success: true, response: "User login done", token: jwttoken })
+        if (signinUser) {
+            const validUser = await bcrypt.compare(
+                password, signinUser.password
+            );
+            if(validUser){
+                const userPayLoad = {email}
+                //Generate the token
+                const jwttoken = await jwt.sign(userPayLoad, process.env.SECREAT_KEY)
+                console.log(jwttoken)
+                return res.status(200).json({ success: true, response: "User login done", token: jwttoken })
+            }
+        }
+        
 
     } catch (error) {
         console.log(error)
