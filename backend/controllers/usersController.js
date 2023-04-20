@@ -1,5 +1,6 @@
 const User = require('../models/userSchema');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt')
 
 const getUser = async (req, res) => {
 try {
@@ -21,8 +22,11 @@ const addUser = async(req, res) => {
     
     try {
         const existingUser = await User.findOne({email})
+        //password hashing 
+        const saltRounds = await bcrypt.genSalt(10);
+        const secpass = await bcrypt.hash(password, saltRounds)
         if(!existingUser){
-            const newUser = await User.create({name, email, password})
+            const newUser = await User.create({name, email, secpass})
             res.status(200).json({success:true, newUser, msg:'user is created successfully'})
         }else{
             res.status(200).json({success:false, msg:"User already exist"})
@@ -52,18 +56,6 @@ const loginUser = async(req, res) => {
         const jwttoken = await jwt.sign(userPayLoad, process.env.SECREAT_KEY)
         console.log(jwttoken)
         return res.status(200).json({ success: true, response: "User login done", token: jwttoken })
-
-
-
-
-        // const jwttoken = jwt.sign(userPayLoad, process.env.SECREAT_KEY, {algorithm:'HS256', expiresIn:"7d"}  )
-        // console.log('token generated')
-        // // res.cookie('jwt', token)
-        // console.log('token sent')
-        // // console.log(token)
-
-        // res.json({status:'success',token:jwttoken, msg:'User login successfully'})
-
 
     } catch (error) {
         console.log(error)
